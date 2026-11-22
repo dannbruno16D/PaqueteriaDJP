@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,4 +45,15 @@ public class Usuario {
     @Builder.Default
     @Column(nullable = false)
     private boolean activo = true;
+
+    @PrePersist
+    @PreUpdate
+    protected void normalizarCampos() {
+        if (this.nombre != null) {
+            this.nombre = this.nombre.trim();
+        }
+        if (this.username != null) {
+            this.username = this.username.trim().toLowerCase();
+        }
+    }
 }
