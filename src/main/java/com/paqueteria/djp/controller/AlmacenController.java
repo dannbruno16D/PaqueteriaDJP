@@ -85,7 +85,7 @@ public class AlmacenController {
         try {
             Paquete actualizado = paqueteService.actualizarEstado(id, estado, ubicacion, detalle);
             redirectAttributes.addFlashAttribute(
-                    "mensaje", "Estado de " + actualizado.getCodigoRastreo() + " actualizado a " + estado.getEtiqueta() + "."
+                    "mensaje", "Estado de " + actualizado.getCodigoRastreo() + " actualizado a " + estado.name() + "."
             );
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -104,9 +104,11 @@ public class AlmacenController {
             }
             Paquete actualizado = paqueteService.asignarUnidad(id, unidadId);
             Unidad unidadAsignada = actualizado.getUnidad();
+            String etiquetaUnidad = (unidadAsignada != null)
+                    ? unidadAsignada.getCodigoUnidad() + " (" + unidadAsignada.getDescripcion() + ")"
+                    : "Unidad #" + unidadId;
             redirectAttributes.addFlashAttribute(
-                    "mensaje", "Unidad " + unidadAsignada.getCodigoUnidad() + " (" + unidadAsignada.getDescripcion()
-                            + ") asignada a " + actualizado.getCodigoRastreo() + "."
+                    "mensaje", "Unidad " + etiquetaUnidad + " asignada a " + actualizado.getCodigoRastreo() + "."
             );
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
@@ -126,9 +128,12 @@ public class AlmacenController {
             Usuario transportista = usuarioService.buscarPorId(transportistaId)
                     .orElseThrow(() -> new IllegalArgumentException("Transportista no encontrado: " + transportistaId));
             Paquete actualizado = paqueteService.asignarTransportista(id, transportista);
+            Usuario asignado = (actualizado.getTransportista() != null)
+                    ? actualizado.getTransportista()
+                    : transportista;
             redirectAttributes.addFlashAttribute(
-                    "mensaje", "Transportista " + actualizado.getTransportista().getNombre()
-                            + " asignado a " + actualizado.getCodigoRastreo() + "."
+                    "mensaje", "Transportista " + asignado.getNombre() + " (@" + asignado.getUsername()
+                            + ") asignado a " + actualizado.getCodigoRastreo() + "."
             );
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());

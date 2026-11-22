@@ -1,14 +1,16 @@
 package com.paqueteria.djp.service;
 
-import com.paqueteria.djp.model.Rol;
-import com.paqueteria.djp.model.Usuario;
-import com.paqueteria.djp.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import com.paqueteria.djp.model.Rol;
+import com.paqueteria.djp.model.Usuario;
+import com.paqueteria.djp.repository.UsuarioRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +33,16 @@ public class UsuarioService {
 
     public List<Usuario> listarPorRol(Rol rol) {
         return usuarioRepository.findByRol(rol);
+    }
+
+    public List<Usuario> listarTransportistasActivos() {
+        return usuarioRepository.findByRol(Rol.TRANSPORTISTA);
+    }
+
+    @Transactional
+    public Usuario cambiarEstadoActivo(Long id, boolean activo) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con id: " + id));
     }
 
     @Transactional

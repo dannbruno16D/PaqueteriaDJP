@@ -62,7 +62,7 @@ public class TransportistaController {
         try {
             Paquete actualizado = paqueteService.actualizarEstado(id, estado, ubicacion, detalle);
             redirectAttributes.addFlashAttribute(
-                    "mensaje", "Envío " + actualizado.getCodigoRastreo() + " actualizado a " + estado.getEtiqueta() + "."
+                    "mensaje", "Envío " + actualizado.getCodigoRastreo() + " actualizado a " + estado.name() + "."
             );
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("error", ex.getMessage());
