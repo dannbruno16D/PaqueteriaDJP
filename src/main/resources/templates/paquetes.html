@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Paquetes - Paquetería DJP</title>
+</head>
+<body>
+    <h1>Gestión de Paquetes</h1>
+    <a th:href="@{/}">Inicio</a> | <a th:href="@{/rastreo}">Rastrear paquete</a>
+
+    <div th:if="${mensaje}" style="margin: 12px 0; font-weight: bold;">
+        <span th:text="${mensaje}"></span>
+    </div>
+
+    <h2>Registrar nuevo paquete</h2>
+    <form th:action="@{/paquetes/registrar}" th:object="${nuevoPaquete}" method="post">
+        <div>
+            <label for="remitente">Remitente:</label>
+            <input type="text" id="remitente" th:field="*{remitente}" required>
+        </div>
+        <div>
+            <label for="destinatario">Destinatario:</label>
+            <input type="text" id="destinatario" th:field="*{destinatario}" required>
+        </div>
+        <div>
+            <label for="direccionDestino">Dirección destino:</label>
+            <input type="text" id="direccionDestino" th:field="*{direccionDestino}" required>
+        </div>
+        <button type="submit">Registrar paquete</button>
+    </form>
+
+    <h2>Buscar por código de rastreo</h2>
+    <form th:action="@{/paquetes}" method="get">
+        <input type="text" name="codigoRastreo" th:value="${codigoBuscado}" placeholder="Código de rastreo">
+        <button type="submit">Filtrar</button>
+        <a th:href="@{/paquetes}">Ver todos</a>
+    </form>
+
+    <h2>Listado de paquetes</h2>
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Código</th>
+                <th>Remitente</th>
+                <th>Destinatario</th>
+                <th>Destino</th>
+                <th>Estado</th>
+                <th>Actualizar estado</th>
+                <th>Asignar transportista</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${paquetes}">
+                <td th:text="${p.id}"></td>
+                <td th:text="${p.codigoRastreo}"></td>
+                <td th:text="${p.remitente}"></td>
+                <td th:text="${p.destinatario}"></td>
+                <td th:text="${p.direccionDestino}"></td>
+                <td th:text="${p.estado}"></td>
+                <td>
+                    <form th:action="@{/paquetes/{id}/estado(id=${p.id})}" method="post">
+                        <select name="estado">
+                            <option th:each="est : ${estados}"
+                                    th:value="${est}"
+                                    th:text="${est}"
+                                    th:selected="${est == p.estado}"></option>
+                        </select>
+                        <button type="submit">Guardar</button>
+                    </form>
+                </td>
+                <td>
+                    <form th:action="@{/paquetes/{id}/transportista(id=${p.id})}" method="post">
+                        <select name="transportistaId">
+                            <option value="" disabled selected>Seleccionar...</option>
+                            <option th:each="t : ${transportistas}"
+                                    th:value="${t.id}"
+                                    th:text="${t.nombre}"></option>
+                        </select>
+                        <button type="submit">Asignar</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(paquetes)}">
+                <td colspan="8">No hay paquetes registrados.</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
