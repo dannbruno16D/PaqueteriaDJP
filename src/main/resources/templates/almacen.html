@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Almacén | Paquetería DJP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --djp-navy: #0f172a;
+            --djp-amber: #f59e0b;
+            --djp-amber-dark: #d97706;
+            --djp-bg: #f8fafc;
+        }
+
+        body {
+            background-color: var(--djp-bg);
+            color: var(--djp-navy);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .navbar-djp {
+            background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+            border-bottom: 3px solid var(--djp-amber);
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--djp-amber), var(--djp-amber-dark));
+            color: #0f172a;
+            font-size: 1.15rem;
+        }
+
+        .panel-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.15rem;
+        }
+
+        .btn-djp {
+            background-color: var(--djp-amber);
+            border-color: var(--djp-amber);
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .btn-djp:hover,
+        .btn-djp:focus {
+            background-color: var(--djp-amber-dark);
+            border-color: var(--djp-amber-dark);
+            color: #0f172a;
+        }
+
+        .code-pill {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            padding: 0.2rem 0.55rem;
+            border-radius: 0.45rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-djp py-3 mb-4 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" th:href="@{/}">
+                <span class="brand-badge"><i class="bi bi-box-seam-fill"></i></span>
+                <span>Paquetería <span class="text-warning">DJP</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navDjp"
+                    aria-controls="navDjp" aria-expanded="false" aria-label="Menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navDjp">
+                <ul class="navbar-nav ms-auto gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/}"><i class="bi bi-house-door me-1"></i>Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/rastreo}"><i class="bi bi-geo-alt me-1"></i>Rastreo</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/paquetes}"><i class="bi bi-boxes me-1"></i>Paquetes</a></li>
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/almacen}"><i class="bi bi-building me-1"></i>Almacén</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/transportistas}"><i class="bi bi-truck me-1"></i>Transportistas</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/usuarios}"><i class="bi bi-people me-1"></i>Usuarios</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container pb-5 flex-grow-1">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+            <div>
+                <h1 class="h3 fw-bold mb-1"><i class="bi bi-building-check text-warning me-2"></i>Control de Almacén</h1>
+                <p class="text-secondary mb-0">Ingreso a bodega, clasificación por andén y asignación de unidades de reparto.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a th:href="@{/almacen}" class="btn btn-sm"
+                   th:classappend="${estadoFiltro == null} ? 'btn-dark' : 'btn-outline-secondary'">Operativos</a>
+                <a th:href="@{/almacen(estadoFiltro='REGISTRADO')}" class="btn btn-sm"
+                   th:classappend="${estadoFiltro != null && estadoFiltro.name() == 'REGISTRADO'} ? 'btn-dark' : 'btn-outline-secondary'">Registrados</a>
+                <a th:href="@{/almacen(estadoFiltro='EN_ALMACEN')}" class="btn btn-sm"
+                   th:classappend="${estadoFiltro != null && estadoFiltro.name() == 'EN_ALMACEN'} ? 'btn-dark' : 'btn-outline-secondary'">En almacén</a>
+                <a th:href="@{/almacen(estadoFiltro='INCIDENCIA')}" class="btn btn-sm"
+                   th:classappend="${estadoFiltro != null && estadoFiltro.name() == 'INCIDENCIA'} ? 'btn-dark' : 'btn-outline-secondary'">Incidencias</a>
+            </div>
+        </div>
+
+        <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="panel-card shadow-sm">
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Código</th>
+                                <th>Origen → Destino</th>
+                                <th>Carga</th>
+                                <th>Estado</th>
+                                <th>Transportista / Unidad</th>
+                                <th style="min-width: 240px;">Ingreso / Cambio de estado</th>
+                                <th style="min-width: 240px;">Asignar unidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${paquetes}">
+                                <td>
+                                    <a th:href="@{/rastreo(codigo=${p.codigoRastreo})}" class="code-pill text-decoration-none"
+                                       th:text="${p.codigoRastreo}"></a>
+                                </td>
+                                <td class="small">
+                                    <div class="fw-semibold" th:text="${p.ciudadOrigen}"></div>
+                                    <div class="text-secondary" th:text="${p.direccionDestino}"></div>
+                                </td>
+                                <td class="small">
+                                    <div class="fw-medium" th:text="${p.descripcionContenido}"></div>
+                                    <div class="text-secondary" th:text="${#numbers.formatDecimal(p.pesoKg, 1, 1)} + ' kg'"></div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill px-3 py-2"
+                                          th:classappend="${p.estado.name() == 'EN_ALMACEN'} ? 'text-bg-warning' : (${p.estado.name() == 'INCIDENCIA'} ? 'text-bg-danger' : 'text-bg-secondary')"
+                                          th:text="${p.estado.etiqueta}"></span>
+                                </td>
+                                <td class="small">
+                                    <div>
+                                        <span class="text-secondary">Op.:</span>
+                                        <span th:if="${p.transportista != null}" class="fw-semibold" th:text="${p.transportista.nombre}"></span>
+                                        <span th:if="${p.transportista == null}" class="text-secondary fst-italic">Sin asignar</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-secondary">Unid.:</span>
+                                        <span th:if="${p.unidad != null}" class="fw-semibold text-primary"
+                                              th:text="${p.unidad.codigoUnidad + ' (' + p.unidad.placas + ')'}"></span>
+                                        <span th:if="${p.unidad == null}" class="text-secondary fst-italic">Sin asignar</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <form th:if="${p.estado.name() == 'REGISTRADO'}"
+                                          th:action="@{/almacen/{id}/ingresar(id=${p.id})}" method="post" class="d-grid gap-1">
+                                        <input type="text" name="ubicacion" class="form-control form-control-sm"
+                                               placeholder="Andén / Zona (ej. Andén 2)">
+                                        <button type="submit" class="btn btn-sm btn-djp">
+                                            <i class="bi bi-box-arrow-in-down me-1"></i>Ingresar a almacén
+                                        </button>
+                                    </form>
+
+                                    <form th:if="${p.estado.name() != 'REGISTRADO'}"
+                                          th:action="@{/almacen/{id}/estado(id=${p.id})}" method="post" class="d-grid gap-1">
+                                        <div class="d-flex gap-1">
+                                            <select name="estado" class="form-select form-select-sm"
+                                                    th:disabled="${p.estado.name() == 'ENTREGADO'}">
+                                                <option th:each="est : ${estados}"
+                                                        th:value="${est}"
+                                                        th:text="${est.etiqueta}"
+                                                        th:selected="${est == p.estado}"></option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary"
+                                                    th:disabled="${p.estado.name() == 'ENTREGADO'}">OK</button>
+                                        </div>
+                                        <input type="text" name="ubicacion" class="form-control form-control-sm"
+                                               placeholder="Ubicación / Centro"
+                                               th:disabled="${p.estado.name() == 'ENTREGADO'}">
+                                    </form>
+                                </td>
+                                <td>
+                                    <form th:action="@{/almacen/{id}/unidad(id=${p.id})}" method="post" class="d-flex gap-1">
+                                        <select name="unidadId" class="form-select form-select-sm"
+                                                th:disabled="${p.estado.name() == 'ENTREGADO'}">
+                                            <option value="" disabled th:selected="${p.unidad == null}">Elegir unidad...</option>
+                                            <option th:each="u : ${unidades}"
+                                                    th:value="${u.id}"
+                                                    th:text="${u.codigoUnidad + ' - ' + u.descripcion}"
+                                                    th:selected="${p.unidad != null && p.unidad.id == u.id}"></option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-outline-dark"
+                                                th:disabled="${p.estado.name() == 'ENTREGADO'}">Asignar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(paquetes)}">
+                                <td colspan="7" class="text-center text-secondary py-5">
+                                    No hay paquetes en esta vista de almacén.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
