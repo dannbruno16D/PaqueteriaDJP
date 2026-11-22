@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Paquetes | Paquetería DJP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --djp-navy: #0f172a;
+            --djp-amber: #f59e0b;
+            --djp-amber-dark: #d97706;
+            --djp-bg: #f8fafc;
+        }
+
+        body {
+            background-color: var(--djp-bg);
+            color: var(--djp-navy);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .navbar-djp {
+            background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+            border-bottom: 3px solid var(--djp-amber);
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--djp-amber), var(--djp-amber-dark));
+            color: #0f172a;
+            font-size: 1.15rem;
+        }
+
+        .panel-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.15rem;
+        }
+
+        .btn-djp {
+            background-color: var(--djp-amber);
+            border-color: var(--djp-amber);
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .btn-djp:hover,
+        .btn-djp:focus {
+            background-color: var(--djp-amber-dark);
+            border-color: var(--djp-amber-dark);
+            color: #0f172a;
+        }
+
+        .code-pill {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+            padding: 0.2rem 0.55rem;
+            border-radius: 0.45rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-djp py-3 mb-4 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" th:href="@{/}">
+                <span class="brand-badge"><i class="bi bi-box-seam-fill"></i></span>
+                <span>Paquetería <span class="text-warning">DJP</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navDjp"
+                    aria-controls="navDjp" aria-expanded="false" aria-label="Menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navDjp">
+                <ul class="navbar-nav ms-auto gap-lg-2">
+                    <li class="nav-item"><a class="nav-link" th:href="@{/}"><i class="bi bi-house-door me-1"></i>Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/rastreo}"><i class="bi bi-geo-alt me-1"></i>Rastreo</a></li>
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/paquetes}"><i class="bi bi-boxes me-1"></i>Paquetes</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/almacen}"><i class="bi bi-building me-1"></i>Almacén</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/transportistas}"><i class="bi bi-truck me-1"></i>Transportistas</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/usuarios}"><i class="bi bi-people me-1"></i>Usuarios</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container pb-5 flex-grow-1">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+            <div>
+                <h1 class="h3 fw-bold mb-1">Gestión de Paquetes</h1>
+                <p class="text-secondary mb-0">Registra envíos, controla estados operativos y asigna transportistas activos.</p>
+            </div>
+            <a th:href="@{/rastreo}" class="btn btn-outline-dark">
+                <i class="bi bi-search me-1"></i>Ir a rastreo público
+            </a>
+        </div>
+
+        <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="panel-card shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h5 fw-bold mb-0"><i class="bi bi-plus-square-dotted text-warning me-2"></i>Registrar nuevo paquete</h2>
+                            <span class="badge bg-light text-dark border" id="tarifaPreview">Tarifa estimada: $83.00 MXN</span>
+                        </div>
+
+                        <form th:action="@{/paquetes/registrar}" th:object="${nuevoPaquete}" method="post" class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Remitente</label>
+                                <input type="text" th:field="*{remitente}" class="form-control"
+                                       placeholder="Nombre o empresa que envía" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Ciudad / Sucursal de origen</label>
+                                <input type="text" th:field="*{ciudadOrigen}" class="form-control"
+                                       placeholder="Ej. Toluca, CDMX, Querétaro" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Destinatario</label>
+                                <input type="text" th:field="*{destinatario}" class="form-control"
+                                       placeholder="Nombre completo quien recibe" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Teléfono destinatario (10 dígitos)</label>
+                                <input type="tel" th:field="*{telefonoDestinatario}" class="form-control"
+                                       pattern="[0-9]{10}" maxlength="10"
+                                       placeholder="Ej. 7221234567" required>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Dirección de destino</label>
+                                <input type="text" th:field="*{direccionDestino}" class="form-control"
+                                       placeholder="Calle, número, colonia y ciudad de entrega" required>
+                            </div>
+
+                            <div class="col-md-8">
+                                <label class="form-label fw-semibold">Descripción del contenido</label>
+                                <input type="text" th:field="*{descripcionContenido}" class="form-control"
+                                       placeholder="Ej. Equipo electrónico, documentación, ropa" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Peso (kg)</label>
+                                <input type="number" step="0.1" min="0.1" max="500"
+                                       th:field="*{pesoKg}" id="pesoInput"
+                                       class="form-control" placeholder="1.0" required>
+                            </div>
+
+                            <div class="col-12 pt-1 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                <small class="text-secondary">
+                                    <i class="bi bi-shield-check me-1"></i>El código <strong>DJP-XXXX</strong> y el historial inicial se generan automáticamente.
+                                </small>
+                                <button type="submit" class="btn btn-djp px-4">
+                                    <i class="bi bi-send-check me-1"></i>Registrar paquete
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="panel-card shadow-sm h-100 d-flex flex-column justify-content-between">
+                    <div class="card-body p-4">
+                        <h2 class="h5 fw-bold mb-2"><i class="bi bi-funnel text-warning me-2"></i>Buscar por código</h2>
+                        <p class="text-secondary small mb-3">Localiza un envío específico en la tabla operativa.</p>
+
+                        <form th:action="@{/paquetes}" method="get" class="d-grid gap-2 mb-3">
+                            <input type="text" name="codigoRastreo" th:value="${codigoBuscado}"
+                                   class="form-control text-uppercase" placeholder="Ej. DJP-1001">
+                            <button type="submit" class="btn btn-dark">
+                                <i class="bi bi-search me-1"></i>Filtrar envío
+                            </button>
+                        </form>
+
+                        <a th:href="@{/paquetes}" class="btn btn-outline-secondary btn-sm w-100">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Mostrar todos los paquetes
+                        </a>
+                    </div>
+                    <div class="card-footer bg-light border-0 rounded-bottom-4 px-4 py-3 small text-secondary">
+                        Total mostrados: <strong class="text-dark" th:text="${#lists.size(paquetes)}">0</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <h2 class="h5 fw-bold mb-0"><i class="bi bi-table text-warning me-2"></i>Listado de paquetes</h2>
+                    <span class="small text-secondary">Estados avanzados requieren transportista activo</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Código</th>
+                                <th>Origen → Destino</th>
+                                <th>Destinatario</th>
+                                <th>Contenido / Envío</th>
+                                <th>Estado</th>
+                                <th>Transportista</th>
+                                <th style="min-width: 240px;">Actualizar estado</th>
+                                <th style="min-width: 210px;">Asignar transportista</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${paquetes}">
+                                <td>
+                                    <a th:href="@{/rastreo(codigo=${p.codigoRastreo})}" class="code-pill text-decoration-none"
+                                       th:text="${p.codigoRastreo}"></a>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold small" th:text="${p.ciudadOrigen != null ? p.ciudadOrigen : 'Origen'}"></div>
+                                    <div class="text-secondary small" th:text="${p.direccionDestino}"></div>
+                                    <div class="text-muted" style="font-size: 0.78rem;" th:text="'Rem.: ' + ${p.remitente}"></div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold small" th:text="${p.destinatario}"></div>
+                                    <div class="text-secondary small" th:if="${p.telefonoDestinatario != null}"
+                                         th:text="${p.telefonoDestinatario}"></div>
+                                </td>
+                                <td class="small">
+                                    <div class="fw-medium" th:text="${p.descripcionContenido != null ? p.descripcionContenido : 'Envío estándar'}"></div>
+                                    <div class="text-secondary">
+                                        <span th:text="${p.pesoKg != null ? #numbers.formatDecimal(p.pesoKg, 1, 1) + ' kg' : '-'}"></span>
+                                        <span th:if="${p.costoEnvio != null}"
+                                              th:text="' · $' + ${#numbers.formatDecimal(p.costoEnvio, 1, 2)}"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill px-3 py-2 text-bg-secondary"
+                                          th:text="${p.estado}"></span>
+                                </td>
+                                <td class="small">
+                                    <span th:if="${p.transportista != null}" class="fw-semibold text-dark"
+                                          th:text="${p.transportista.nombre}"></span>
+                                    <span th:if="${p.transportista == null}" class="text-secondary fst-italic">Sin asignar</span>
+                                </td>
+                                <td>
+                                    <form th:action="@{/paquetes/{id}/estado(id=${p.id})}" method="post" class="d-grid gap-1">
+                                        <div class="d-flex gap-1">
+                                            <select name="estado" class="form-select form-select-sm"
+                                                    th:disabled="${p.estado.name() == 'ENTREGADO'}">
+                                                <option th:each="est : ${estados}"
+                                                        th:value="${est}"
+                                                        th:text="${est}"
+                                                        th:selected="${est == p.estado}"></option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary"
+                                                    th:disabled="${p.estado.name() == 'ENTREGADO'}">OK</button>
+                                        </div>
+                                        <input type="text" name="ubicacion" class="form-control form-control-sm"
+                                               placeholder="Ubicación (opcional)"
+                                               th:disabled="${p.estado.name() == 'ENTREGADO'}">
+                                    </form>
+                                </td>
+                                <td>
+                                    <form th:action="@{/paquetes/{id}/transportista(id=${p.id})}" method="post" class="d-flex gap-1">
+                                        <select name="transportistaId" class="form-select form-select-sm"
+                                                th:disabled="${p.estado.name() == 'ENTREGADO'}">
+                                            <option value="" disabled th:selected="${p.transportista == null}">Elegir...</option>
+                                            <option th:each="t : ${transportistas}"
+                                                    th:value="${t.id}"
+                                                    th:text="${t.nombre}"
+                                                    th:selected="${p.transportista != null && p.transportista.id == t.id}"></option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-outline-dark"
+                                                th:disabled="${p.estado.name() == 'ENTREGADO'}">Asignar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(paquetes)}">
+                                <td colspan="8" class="text-center text-secondary py-5">
+                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                    No se encontraron paquetes con el criterio actual.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-top py-3 mt-auto">
+        <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center small text-secondary">
+            <span><strong class="text-dark">Paquetería DJP</strong> · Módulo de Gestión Operativa</span>
+            <a th:href="@{/}" class="text-decoration-none text-secondary">Volver al inicio</a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function () {
+            const pesoInput = document.getElementById('pesoInput');
+            const preview = document.getElementById('tarifaPreview');
+            if (!pesoInput || !preview) return;
+
+            function actualizarTarifa() {
+                const peso = parseFloat(pesoInput.value);
+                const pesoValido = (!isNaN(peso) && peso > 0) ? peso : 1.0;
+                const total = 65.0 + (pesoValido * 18.0);
+                preview.textContent = 'Tarifa estimada: $' + total.toFixed(2) + ' MXN';
+            }
+
+            pesoInput.addEventListener('input', actualizarTarifa);
+            actualizarTarifa();
+        })();
+    </script>
+</body>
+</html>

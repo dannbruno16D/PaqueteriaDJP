@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paquetería DJP | Logística y Rastreo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --djp-navy: #0f172a;
+            --djp-amber: #f59e0b;
+            --djp-amber-dark: #d97706;
+            --djp-surface: #ffffff;
+            --djp-bg: #f8fafc;
+        }
+
+        body {
+            background-color: var(--djp-bg);
+            color: var(--djp-navy);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .navbar-djp {
+            background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+            border-bottom: 3px solid var(--djp-amber);
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--djp-amber), var(--djp-amber-dark));
+            color: #0f172a;
+            font-size: 1.15rem;
+        }
+
+        .hero-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #273549 100%);
+            color: #ffffff;
+            border-radius: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::after {
+            content: "";
+            position: absolute;
+            right: -60px;
+            bottom: -60px;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: rgba(245, 158, 11, 0.14);
+            pointer-events: none;
+        }
+
+        .btn-djp {
+            background-color: var(--djp-amber);
+            border-color: var(--djp-amber);
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .btn-djp:hover,
+        .btn-djp:focus {
+            background-color: var(--djp-amber-dark);
+            border-color: var(--djp-amber-dark);
+            color: #0f172a;
+        }
+
+        .module-card {
+            background: var(--djp-surface);
+            border: 1px solid #e2e8f0;
+            border-radius: 1.15rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -10px rgba(15, 23, 42, 0.14);
+            border-color: #cbd5e1;
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+        }
+
+        .step-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #fef3c7;
+            color: #b45309;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-djp py-3 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" th:href="@{/}">
+                <span class="brand-badge"><i class="bi bi-box-seam-fill"></i></span>
+                <span>Paquetería <span class="text-warning">DJP</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navDjp"
+                    aria-controls="navDjp" aria-expanded="false" aria-label="Menú">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navDjp">
+                <ul class="navbar-nav ms-auto gap-lg-2">
+                    <li class="nav-item"><a class="nav-link active" th:href="@{/}"><i class="bi bi-house-door me-1"></i>Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/rastreo}"><i class="bi bi-geo-alt me-1"></i>Rastreo</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/paquetes}"><i class="bi bi-boxes me-1"></i>Paquetes</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/almacen}"><i class="bi bi-building me-1"></i>Almacén</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/transportistas}"><i class="bi bi-truck me-1"></i>Transportistas</a></li>
+                    <li class="nav-item"><a class="nav-link" th:href="@{/usuarios}"><i class="bi bi-people me-1"></i>Usuarios</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5 flex-grow-1">
+        <section class="hero-card p-4 p-md-5 shadow-sm mb-5">
+            <div class="row align-items-center g-4 position-relative" style="z-index: 1;">
+                <div class="col-lg-7">
+                    <span class="badge rounded-pill text-bg-warning text-dark fw-semibold px-3 py-2 mb-3">
+                        <i class="bi bi-lightning-charge-fill me-1"></i>Plataforma Logística Integral
+                    </span>
+                    <h1 class="display-5 fw-bold mb-3">
+                        Cada envío, <span class="text-warning">trazable</span> de inicio a fin.
+                    </h1>
+                    <p class="text-light opacity-75 fs-5 mb-4">
+                        Coordina recepción, control de almacén, asignación de transportistas, estados operativos y rastreo en tiempo real con reglas de negocio confiables.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a class="btn btn-djp btn-lg px-4" th:href="@{/paquetes}">
+                            <i class="bi bi-plus-circle me-2"></i>Gestionar paquetes
+                        </a>
+                        <a class="btn btn-outline-light btn-lg px-4" th:href="@{/rastreo}">
+                            <i class="bi bi-search me-2"></i>Rastrear por código
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="bg-white text-dark rounded-4 p-4 shadow">
+                        <h2 class="h5 fw-bold mb-1"><i class="bi bi-upc-scan text-warning me-2"></i>Rastreo rápido</h2>
+                        <p class="text-secondary small mb-3">Ingresa el código de tu paquete para ver su historial y ubicación.</p>
+                        <form th:action="@{/rastreo}" method="get" class="d-grid gap-2">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light"><i class="bi bi-search text-secondary"></i></span>
+                                <input type="text"
+                                       name="codigo"
+                                       class="form-control text-uppercase"
+                                       placeholder="Ej. DJP-1001"
+                                       required>
+                            </div>
+                            <button type="submit" class="btn btn-dark btn-lg fw-semibold">
+                                Consultar estado
+                            </button>
+                        </form>
+                        <div class="mt-3 pt-2 border-top small text-secondary d-flex justify-content-between">
+                            <span>Prueba códigos demo:</span>
+                            <span class="fw-semibold text-dark">DJP-1001 · DJP-1003</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5">
+            <div class="d-flex justify-content-between align-items-end mb-3">
+                <div>
+                    <h2 class="h4 fw-bold mb-1">Ciclo operativo del paquete</h2>
+                    <p class="text-secondary mb-0">Control estricto de estados sin saltos ni registros duplicados.</p>
+                </div>
+            </div>
+            <div class="row g-3">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="module-card p-3 h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="step-pill">1</span>
+                            <span class="fw-bold">Registrado</span>
+                        </div>
+                        <p class="text-secondary small mb-0">Alta en recepción con origen, destino, peso, tarifa y código DJP único.</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="module-card p-3 h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="step-pill">2</span>
+                            <span class="fw-bold">En almacén</span>
+                        </div>
+                        <p class="text-secondary small mb-0">Verificación, clasificación por ruta y preparación en centro operativo.</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="module-card p-3 h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="step-pill">3</span>
+                            <span class="fw-bold">Tránsito y reparto</span>
+                        </div>
+                        <p class="text-secondary small mb-0">Requiere transportista activo asignado para trasladar y entregar en destino.</p>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="module-card p-3 h-100">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="step-pill">4</span>
+                            <span class="fw-bold">Entregado / Incidencia</span>
+                        </div>
+                        <p class="text-secondary small mb-0">Cierre verificado del envío o registro de incidencia con trazabilidad completa.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="h4 fw-bold mb-3">Accesos del sistema</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="module-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="icon-box bg-warning-subtle text-warning-emphasis mb-3">
+                                <i class="bi bi-clipboard-check"></i>
+                            </div>
+                            <h3 class="h5 fw-bold">Recepción y Gestión de Paquetes</h3>
+                            <p class="text-secondary mb-4">
+                                Registra nuevos envíos, calcula el costo base por peso, asigna transportistas activos y actualiza estados con validación de reglas.
+                            </p>
+                        </div>
+                        <div>
+                            <a th:href="@{/paquetes}" class="btn btn-dark">
+                                Ir a gestión de paquetes <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="module-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="icon-box bg-primary-subtle text-primary mb-3">
+                                <i class="bi bi-map"></i>
+                            </div>
+                            <h3 class="h5 fw-bold">Portal de Rastreo de Envíos</h3>
+                            <p class="text-secondary mb-4">
+                                Consulta el estado actual del paquete, datos de origen y destino, transportista asignado y la línea de tiempo con ubicación y detalle.
+                            </p>
+                        </div>
+                        <div>
+                            <a th:href="@{/rastreo}" class="btn btn-outline-dark">
+                                Abrir rastreador <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-top py-4 mt-auto">
+        <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 small text-secondary">
+            <span><strong class="text-dark">Paquetería DJP</strong> · Control Logístico y Trazabilidad</span>
+            <span>Spring Boot · Thymeleaf · Bootstrap 5</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
