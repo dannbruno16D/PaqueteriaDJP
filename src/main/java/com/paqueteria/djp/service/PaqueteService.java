@@ -13,10 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.paqueteria.djp.model.EstadoPaquete;
 import com.paqueteria.djp.model.Paquete;
 import com.paqueteria.djp.model.Rol;
-import com.paqueteria.djp.model.Unidad;
 import com.paqueteria.djp.model.Usuario;
 import com.paqueteria.djp.repository.PaqueteRepository;
-import com.paqueteria.djp.repository.UnidadRepository;
 import com.paqueteria.djp.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -34,7 +32,6 @@ public class PaqueteService {
 
     private final PaqueteRepository paqueteRepository;
     private final UsuarioRepository usuarioRepository;
-    private final UnidadRepository unidadRepository;
 
     public List<Paquete> listarTodos() {
         return paqueteRepository.findAllByOrderByUltimaActualizacionDesc();
@@ -171,31 +168,6 @@ public class PaqueteService {
         }
 
         paquete.setTransportista(transportistaReal);
-        paquete.setUltimaActualizacion(LocalDateTime.now());
-        return paqueteRepository.save(paquete);
-    }
-
-    @Transactional
-    public Paquete asignarUnidad(Long id, Long unidadId) {
-        Paquete paquete = paqueteRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Paquete no encontrado con id: " + id));
-
-        if (paquete.getEstado() == EstadoPaquete.ENTREGADO) {
-            throw new IllegalStateException("No se puede asignar unidad a un paquete ya ENTREGADO.");
-        }
-
-        if (unidadId == null) {
-            throw new IllegalArgumentException("Debes seleccionar una unidad activa.");
-        }
-
-        Unidad unidadReal = unidadRepository.findById(unidadId)
-                .orElseThrow(() -> new IllegalArgumentException("Unidad no encontrada."));
-
-        if (!unidadReal.isActiva()) {
-            throw new IllegalStateException("No se puede asignar una unidad inactiva.");
-        }
-
-        paquete.setUnidad(unidadReal);
         paquete.setUltimaActualizacion(LocalDateTime.now());
         return paqueteRepository.save(paquete);
     }
