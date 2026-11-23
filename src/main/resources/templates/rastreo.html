@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreo - Paquetería DJP</title>
+</head>
+<body>
+    <h1>Rastreo de Paquete</h1>
+    <a th:href="@{/}">Inicio</a> | <a th:href="@{/paquetes}">Gestión de paquetes</a>
+
+    <form th:action="@{/rastreo}" method="get">
+        <label for="codigo">Código de rastreo:</label>
+        <input type="text" id="codigo" name="codigo" th:value="${codigoBuscado}" placeholder="Ej. DJP-1234ABCD" required>
+        <button type="submit">Buscar</button>
+    </form>
+
+    <div th:if="${codigoBuscado != null}">
+        <div th:if="${paqueteEncontrado != null}">
+            <h2>Resultado para <span th:text="${paqueteEncontrado.codigoRastreo}"></span></h2>
+            <p><strong>Estado:</strong> <span th:text="${paqueteEncontrado.estado}"></span></p>
+            <p><strong>Destinatario:</strong> <span th:text="${paqueteEncontrado.destinatario}"></span></p>
+            <p><strong>Dirección destino:</strong> <span th:text="${paqueteEncontrado.direccionDestino}"></span></p>
+        </div>
+        <div th:if="${paqueteEncontrado == null}">
+            <p>No se encontró ningún paquete con el código <strong th:text="${codigoBuscado}"></strong>.</p>
+        </div>
+    </div>
+</body>
+</html>
